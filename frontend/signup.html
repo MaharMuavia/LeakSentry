@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create account · LeakSentry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="/theme.css" />
+</head>
+<body>
+<div class="auth-wrap">
+  <aside class="auth-aside">
+    <div class="glow"></div>
+    <a class="brand" href="/" style="position:relative;z-index:2">
+      <svg class="mark" viewBox="0 0 32 32" fill="none">
+        <path d="M16 2 L28 7 V16 C28 24 22 29 16 31 C10 29 4 24 4 16 V7 Z" stroke="#fff" stroke-width="1.6" fill="rgba(255,255,255,.12)"/>
+        <path d="M16 11 C13 14 13 17 16 21 C19 17 19 14 16 11Z" fill="#fff"/>
+        <circle cx="16" cy="24" r="1.5" fill="#fff"/>
+      </svg>
+      <div><h1 style="color:#fff">LeakSentry</h1><div class="sub" style="color:rgba(255,255,255,.7)">Revenue Leakage Audit</div></div>
+    </a>
+    <div style="position:absolute;bottom:46px;left:46px;right:46px;z-index:2">
+      <div class="serif" style="font-size:29px;font-weight:600;line-height:1.14;letter-spacing:-.01em">
+        Turn three systems that disagree into one number you can recover.</div>
+      <ul style="margin-top:20px;font-size:14px;opacity:.9;list-style:none;display:grid;gap:10px">
+        <li>✓ Deterministic dollar math — never hallucinated</li>
+        <li>✓ Gemini judgment clears the noise</li>
+        <li>✓ Human-approval gate · nothing auto-sent</li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <h2>Create your account</h2>
+      <p class="lead">Start auditing in seconds. <b>(Demo — no real authentication.)</b></p>
+      <form onsubmit="return go(event)">
+        <div class="field"><label>Full name</label><input type="text" id="name" placeholder="Alex Morgan" required /></div>
+        <div class="field"><label>Work email</label><input type="email" id="email" placeholder="you@company.com" required /></div>
+        <div class="field"><label>Password</label><input type="password" id="pw" placeholder="Choose a password" required /></div>
+        <button class="btn btn-primary" type="submit">Create account</button>
+      </form>
+      <div class="divider">or</div>
+      <button class="btn btn-ghost guest" onclick="guest()">Continue as guest →</button>
+      <div class="auth-foot">Already have an account? <a href="/signin">Sign in</a></div>
+    </div>
+  </main>
+</div>
+<script>
+  function setUser(name){ try{ localStorage.setItem('leaksentry_user', name); }catch(e){} location.href='/app'; }
+  function go(e){ e.preventDefault(); const nm=document.getElementById('name').value.trim(); setUser(nm||'Member'); return false; }
+  function guest(){ setUser('Guest'); }
+</script>
+</body>
+</html>

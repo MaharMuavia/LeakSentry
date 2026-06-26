@@ -24,7 +24,14 @@ from tools import case_memory, data_loader
 app = FastAPI(title="LeakSentry", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-FRONTEND = os.path.join(config.ROOT, "frontend", "index.html")
+FRONTEND_DIR = os.path.join(config.ROOT, "frontend")
+
+
+def _page(name: str, media_type: str = "text/html"):
+    path = os.path.join(FRONTEND_DIR, name)
+    if os.path.exists(path):
+        return FileResponse(path, media_type=media_type)
+    return JSONResponse({"message": f"LeakSentry API up. {name} not found."}, status_code=404)
 
 # In-memory store of the most recent audit (findings keyed by signature).
 STATE: dict = {"report": None, "run_id": None, "generated_at": None, "by_sig": {}}
@@ -149,7 +156,25 @@ def reject(signature: str) -> dict:
 
 
 @app.get("/")
+def landing():
+    return _page("landing.html")
+
+
+@app.get("/signin")
+def signin():
+    return _page("signin.html")
+
+
+@app.get("/signup")
+def signup():
+    return _page("signup.html")
+
+
+@app.get("/app")
 def dashboard():
-    if os.path.exists(FRONTEND):
-        return FileResponse(FRONTEND)
-    return JSONResponse({"message": "LeakSentry API up. Dashboard not built yet."})
+    return _page("index.html")
+
+
+@app.get("/theme.css")
+def theme():
+    return _page("theme.css", media_type="text/css")

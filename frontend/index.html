@@ -3,197 +3,144 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>LeakSentry — Revenue Leakage Audit</title>
+<title>Dashboard · LeakSentry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
 <style>
-  :root{
-    --ink:#0b0d12; --panel:#13161f; --panel-2:#171b26; --line:#252b39;
-    --text:#e7eaf2; --muted:#8b94a7; --faint:#5d6679;
-    --gold:#f4c451; --gold-dim:#caa23f;
-    --emerald:#34d399; --amber:#fbbf24; --slate:#64748b;
-    --t-overage:#37d6c4; --t-renewal:#f59e6b; --t-billing:#6ea8fe;
-    --t-discount:#e2719b; --t-commit:#c4b5fd;
-    --shadow:0 24px 60px -20px rgba(0,0,0,.7);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:"IBM Plex Sans",system-ui,sans-serif; color:var(--text);
-    background:var(--ink); line-height:1.45; -webkit-font-smoothing:antialiased;
-    min-height:100vh; overflow-x:hidden;
-  }
-  body::before{ /* atmosphere: vault glow + grid */
-    content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
-    background:
-      radial-gradient(900px 500px at 78% -8%, rgba(244,196,81,.10), transparent 60%),
-      radial-gradient(700px 480px at 8% 108%, rgba(55,214,196,.08), transparent 60%),
-      var(--ink);
-  }
-  body::after{ /* faint engineering grid */
-    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.5;
-    background-image:linear-gradient(var(--line) 1px,transparent 1px),
-      linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size:46px 46px; mask-image:radial-gradient(circle at 50% 30%,#000,transparent 80%);
-    opacity:.08;
-  }
-  .mono{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
-  .serif{font-family:"Fraunces",serif}
-
-  /* ---- shell ---- */
   .wrap{max-width:1280px; margin:0 auto; padding:0 28px}
-  header.topbar{
-    display:flex; align-items:center; gap:18px; padding:22px 28px;
-    border-bottom:1px solid var(--line); position:sticky; top:0; z-index:30;
-    background:rgba(11,13,18,.82); backdrop-filter:blur(12px);
-  }
-  .brand{display:flex; align-items:center; gap:11px}
-  .mark{width:30px; height:30px; position:relative; flex:0 0 auto}
-  .brand h1{font-size:19px; letter-spacing:-.01em; font-weight:600}
-  .brand .sub{font-size:11px; color:var(--faint); letter-spacing:.16em; text-transform:uppercase}
-  .spacer{flex:1}
-  .engine{
-    font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:999px;
-    padding:6px 12px; display:flex; align-items:center; gap:7px; letter-spacing:.04em;
-  }
-  .engine .dot{width:7px;height:7px;border-radius:50%; background:var(--emerald); box-shadow:0 0 10px var(--emerald)}
-  .engine.heur .dot{background:var(--amber); box-shadow:0 0 10px var(--amber)}
-  button.run{
-    font-family:inherit; font-weight:600; font-size:13.5px; letter-spacing:.01em;
-    color:#15120a; background:linear-gradient(180deg,var(--gold),var(--gold-dim));
-    border:none; border-radius:10px; padding:11px 20px; cursor:pointer;
-    display:flex; align-items:center; gap:9px; transition:transform .15s, box-shadow .2s;
-    box-shadow:0 8px 22px -8px rgba(244,196,81,.6);
-  }
-  button.run:hover{transform:translateY(-1px); box-shadow:0 12px 28px -8px rgba(244,196,81,.75)}
+  .userbox{display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted)}
+  .avatar{width:30px;height:30px;border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:12px;
+    color:#fff; background:linear-gradient(150deg,var(--green),var(--green-deep))}
+  .signout{font-size:12.5px; color:var(--muted); border:1px solid var(--line); background:#fff; border-radius:8px; padding:7px 12px; cursor:pointer; transition:.15s}
+  .signout:hover{color:var(--ink); border-color:var(--gold)}
+  .engine{font-size:11px; color:var(--muted); border:1px solid var(--line); background:#fff; border-radius:999px;
+    padding:6px 12px; display:flex; align-items:center; gap:7px; letter-spacing:.03em}
+  .engine .dot{width:7px;height:7px;border-radius:50%; background:var(--green); box-shadow:0 0 8px rgba(15,157,107,.6)}
+  .engine.heur .dot{background:var(--amber); box-shadow:0 0 8px rgba(217,119,6,.6)}
+  button.run{font-family:inherit; font-weight:600; font-size:13.5px; color:#fff;
+    background:linear-gradient(180deg,var(--green),var(--green-deep)); border:none; border-radius:10px; padding:11px 20px;
+    cursor:pointer; display:flex; align-items:center; gap:9px; transition:transform .15s, box-shadow .2s;
+    box-shadow:0 10px 22px -10px rgba(15,157,107,.6)}
+  button.run:hover{transform:translateY(-1px)}
   button.run:disabled{opacity:.6; cursor:wait; transform:none}
-  button.run .pulse{width:8px;height:8px;border-radius:50%;background:#15120a}
+  button.run .pulse{width:8px;height:8px;border-radius:50%;background:#fff}
   button.run.loading .pulse{animation:blink .8s infinite}
   @keyframes blink{50%{opacity:.25}}
 
-  /* ---- hero ---- */
-  .hero{padding:54px 0 30px; display:grid; grid-template-columns:1.05fr .95fr; gap:48px; align-items:end}
-  .eyebrow{font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-bottom:18px}
-  .headline-num{font-size:clamp(48px,7vw,86px); font-weight:600; letter-spacing:-.03em; line-height:.95}
-  .headline-num .cur{color:var(--gold); font-size:.5em; vertical-align:.32em; margin-right:.06em}
+  .hero{padding:46px 0 26px; display:grid; grid-template-columns:1.05fr .95fr; gap:46px; align-items:end}
+  .eyebrow{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-2); margin-bottom:16px; font-weight:600}
+  .headline-num{font-family:"IBM Plex Mono",monospace; font-size:clamp(46px,7vw,84px); font-weight:600;
+    letter-spacing:-.03em; line-height:.95; color:var(--green-deep)}
+  .headline-num .cur{color:var(--gold); font-size:.5em; vertical-align:.34em; margin-right:.05em}
   .headline-sub{font-size:16px; color:var(--muted); margin-top:18px; max-width:46ch}
-  .headline-sub b{color:var(--text); font-weight:600}
+  .headline-sub b{color:var(--ink); font-weight:600}
   .chips{display:flex; gap:12px; margin-top:24px; flex-wrap:wrap}
-  .chip{border:1px solid var(--line); border-radius:11px; padding:11px 15px; background:var(--panel)}
-  .chip .k{font-size:11px; color:var(--faint); letter-spacing:.06em; text-transform:uppercase}
-  .chip .v{font-size:18px; font-weight:600; margin-top:3px}
+  .chip{border:1px solid var(--line); border-radius:12px; padding:12px 16px; background:#fff; box-shadow:var(--shadow-sm)}
+  .chip .k{font-size:11px; color:var(--faint); letter-spacing:.05em; text-transform:uppercase}
+  .chip .v{font-size:18px; font-weight:600; margin-top:3px; color:var(--ink)}
   .chip.review .v{color:var(--amber)} .chip.noise .v{color:var(--slate)}
 
-  /* ---- breakdown ---- */
-  .panel{background:linear-gradient(180deg,var(--panel),var(--panel-2)); border:1px solid var(--line);
-    border-radius:16px; box-shadow:var(--shadow)}
   .breakdown{padding:24px 26px}
-  .breakdown h3, .ledger h3, .section-h{font-family:"Fraunces",serif; font-weight:500; font-size:15px;
-    letter-spacing:.01em; color:var(--text); display:flex; align-items:center; gap:9px; margin-bottom:6px}
-  .breakdown .cap{font-size:11.5px; color:var(--faint); margin-bottom:20px; letter-spacing:.03em}
-  .bar-row{margin:15px 0}
+  .breakdown h3,.ledger h3,.section-h{font-family:"Fraunces",serif; font-weight:600; font-size:15px; color:var(--ink);
+    display:flex; align-items:center; gap:9px; margin-bottom:6px}
+  .breakdown .cap{font-size:11.5px; color:var(--faint); margin-bottom:18px}
+  .bar-row{margin:14px 0}
   .bar-row .top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px}
-  .bar-row .name{font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:8px}
+  .bar-row .name{font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:8px}
   .bar-row .swatch{width:9px;height:9px;border-radius:2px}
-  .bar-row .amt{font-size:13px; font-weight:600}
+  .bar-row .amt{font-size:13px; font-weight:600; color:var(--ink)}
   .bar-row .cnt{color:var(--faint); font-weight:400; font-size:11px; margin-left:6px}
-  .track{height:9px; background:#0e1118; border-radius:6px; overflow:hidden; position:relative; border:1px solid #1c2230}
+  .track{height:9px; background:#f0ede5; border-radius:6px; overflow:hidden; position:relative; border:1px solid var(--line-2)}
   .fill{height:100%; width:0; border-radius:6px; transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
-  .fill.weighted{position:absolute; inset:0; width:0; opacity:.35; background:repeating-linear-gradient(45deg,#fff2,#fff2 5px,transparent 5px,transparent 10px)}
+  .fill.weighted{position:absolute; inset:0; width:0; opacity:.45; background:repeating-linear-gradient(45deg,#fff8,#fff8 5px,transparent 5px,transparent 10px)}
 
-  /* ---- ledger ---- */
-  .ledger{margin:34px 0 80px; padding:24px 26px}
-  .ledger .head{display:flex; align-items:center; gap:16px; margin-bottom:18px; flex-wrap:wrap}
-  .tabs{display:flex; gap:6px; margin-left:auto; background:#0e1118; border:1px solid var(--line); border-radius:10px; padding:4px}
+  .ledger{margin:32px 0 80px; padding:24px 26px}
+  .ledger .head{display:flex; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap}
+  .tabs{display:flex; gap:5px; margin-left:auto; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:4px}
   .tabs button{font-family:inherit; font-size:12px; color:var(--muted); background:none; border:none; padding:7px 13px; border-radius:7px; cursor:pointer; transition:.15s}
-  .tabs button.active{background:var(--panel-2); color:var(--text); box-shadow:0 1px 0 #0006}
+  .tabs button.active{background:#fff; color:var(--ink); box-shadow:var(--shadow-sm)}
   table{width:100%; border-collapse:collapse}
-  thead th{font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint);
-    text-align:left; padding:0 14px 12px; font-weight:600; border-bottom:1px solid var(--line)}
+  thead th{font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint);
+    text-align:left; padding:0 14px 11px; font-weight:600; border-bottom:1px solid var(--line)}
   thead th.r, td.r{text-align:right}
-  tbody tr{cursor:pointer; transition:background .14s; border-bottom:1px solid #1a1f2b}
-  tbody tr:hover{background:#1a1f2c}
-  tbody td{padding:14px; font-size:13.5px; vertical-align:middle}
+  tbody tr{cursor:pointer; transition:background .14s; border-bottom:1px solid var(--line-2)}
+  tbody tr:hover{background:var(--paper-2)}
+  tbody td{padding:13px 14px; font-size:13.5px; vertical-align:middle}
   .rank{color:var(--faint); font-size:12px; width:34px}
-  .cust{font-weight:600}
+  .cust{font-weight:600; color:var(--ink)}
   .cust .prod{color:var(--faint); font-weight:400; font-size:11.5px; margin-top:2px}
-  .pill{display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600;
-    padding:4px 9px; border-radius:999px; letter-spacing:.02em; white-space:nowrap}
-  .pill .swatch{width:7px;height:7px;border-radius:50%}
-  .impact{font-weight:600; font-size:14.5px}
-  .confbar{width:74px; height:6px; background:#0e1118; border:1px solid #1c2230; border-radius:5px; overflow:hidden; display:inline-block; vertical-align:middle; margin-right:9px}
-  .confbar i{display:block; height:100%; background:var(--emerald)}
+  .impact{font-weight:600; font-size:14.5px; color:var(--ink)}
+  .confbar{width:74px; height:6px; background:#eee9df; border:1px solid var(--line-2); border-radius:5px; overflow:hidden; display:inline-block; vertical-align:middle; margin-right:9px}
+  .confbar i{display:block; height:100%; background:var(--green)}
   .stat{font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px}
-  .stat.CONFIRMED{color:var(--emerald); background:rgba(52,211,153,.1)}
-  .stat.NEEDS_REVIEW{color:var(--amber); background:rgba(251,191,36,.1)}
-  .stat.DISMISSED{color:var(--slate); background:rgba(100,116,139,.12)}
-  .stat.RESOLVED{color:#7dd3fc; background:rgba(125,211,252,.1)}
+  .stat.CONFIRMED{color:var(--green-deep); background:var(--green-soft)}
+  .stat.NEEDS_REVIEW{color:var(--amber); background:var(--amber-soft)}
+  .stat.DISMISSED{color:#64748b; background:#eef1f4}
+  .stat.RESOLVED{color:var(--sky); background:#dcf0fb}
 
-  /* ---- drawer ---- */
-  .scrim{position:fixed; inset:0; background:rgba(4,6,10,.62); backdrop-filter:blur(3px);
+  /* drawer */
+  .scrim{position:fixed; inset:0; background:rgba(40,38,30,.34); backdrop-filter:blur(2px);
     opacity:0; pointer-events:none; transition:opacity .3s; z-index:40}
   .scrim.open{opacity:1; pointer-events:auto}
-  .drawer{position:fixed; top:0; right:0; height:100vh; width:min(660px,94vw); background:var(--ink);
-    border-left:1px solid var(--line); box-shadow:-30px 0 80px -30px #000; z-index:50;
-    transform:translateX(102%); transition:transform .42s cubic-bezier(.4,.0,.1,1); display:flex; flex-direction:column}
+  .drawer{position:fixed; top:0; right:0; height:100vh; width:min(660px,94vw); background:var(--paper-2);
+    border-left:1px solid var(--line); box-shadow:var(--shadow-lg); z-index:50;
+    transform:translateX(102%); transition:transform .42s cubic-bezier(.4,0,.1,1); display:flex; flex-direction:column}
   .drawer.open{transform:none}
-  .drawer .dhead{padding:24px 28px; border-bottom:1px solid var(--line); position:relative}
-  .drawer .close{position:absolute; top:22px; right:24px; background:none; border:1px solid var(--line);
-    color:var(--muted); width:32px;height:32px;border-radius:8px; cursor:pointer; font-size:16px; transition:.15s}
-  .drawer .close:hover{color:var(--text); border-color:var(--muted)}
-  .drawer .dimpact{font-size:38px; font-weight:600; letter-spacing:-.02em; margin-top:6px}
+  .drawer .dhead{padding:24px 28px; border-bottom:1px solid var(--line); position:relative; background:#fff}
+  .drawer .close{position:absolute; top:22px; right:24px; background:#fff; border:1px solid var(--line);
+    color:var(--muted); width:32px;height:32px;border-radius:8px; cursor:pointer; font-size:15px; transition:.15s}
+  .drawer .close:hover{color:var(--ink); border-color:var(--muted)}
+  .drawer .dimpact{font-family:"IBM Plex Mono",monospace; font-size:38px; font-weight:600; letter-spacing:-.02em; margin-top:6px; color:var(--ink)}
   .drawer .dimpact .cur{color:var(--gold); font-size:.5em; vertical-align:.3em}
   .dbody{overflow-y:auto; padding:8px 28px 40px; flex:1}
-  .block{margin-top:28px}
-  .block .section-h{margin-bottom:14px; padding-bottom:9px; border-bottom:1px solid var(--line)}
-  .expl{font-size:14px; color:#cfd5e2; background:var(--panel); border:1px solid var(--line);
-    border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:14px 16px}
+  .block{margin-top:26px}
+  .block .section-h{margin-bottom:13px; padding-bottom:9px; border-bottom:1px solid var(--line)}
+  .expl{font-size:14px; color:var(--text); background:#fff; border:1px solid var(--line);
+    border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:14px 16px; box-shadow:var(--shadow-sm)}
   .ev-table{width:100%; border-collapse:collapse; font-size:11.5px; margin-top:4px}
-  .ev-table th{font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); text-align:left; padding:6px 8px; border-bottom:1px solid var(--line)}
-  .ev-table td{padding:6px 8px; border-bottom:1px solid #161b26; color:var(--muted)}
-  .ev-table td.hl{color:var(--text); font-weight:600}
-  .ev-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--panel)}
-  .ev-label{font-size:11px; color:var(--faint); letter-spacing:.08em; text-transform:uppercase; margin:16px 0 6px}
-  /* trace timeline */
+  .ev-table th{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--faint); text-align:left; padding:7px 9px; border-bottom:1px solid var(--line)}
+  .ev-table td{padding:7px 9px; border-bottom:1px solid var(--line-2); color:var(--muted)}
+  .ev-table td.hl{color:var(--ink); font-weight:600}
+  .ev-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:#fff}
+  .ev-label{font-size:11px; color:var(--faint); letter-spacing:.07em; text-transform:uppercase; margin:16px 0 6px; font-weight:600}
   .trace{position:relative; padding-left:24px}
   .trace::before{content:""; position:absolute; left:7px; top:6px; bottom:6px; width:1px; background:var(--line)}
   .tstep{position:relative; padding:9px 0}
   .tstep::before{content:""; position:absolute; left:-21px; top:14px; width:9px;height:9px;border-radius:50%;
-    background:var(--t-billing); box-shadow:0 0 0 3px var(--ink)}
+    background:var(--t-billing); box-shadow:0 0 0 3px var(--paper-2)}
   .tstep.tool-gemini::before{background:var(--gold)} .tstep.tool-heuristic::before{background:var(--t-overage)}
-  .tstep.tool-template::before{background:var(--t-commit)} .tstep.action-guardrail::before{background:#f87171}
+  .tstep.tool-template::before{background:var(--t-commit)} .tstep.action-guardrail::before{background:#e11d48}
   .tstep .tl{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
-  .tstep .agent{font-size:12.5px; font-weight:600}
-  .tstep .act{font-size:11px; color:var(--gold); font-family:"IBM Plex Mono",monospace}
+  .tstep .agent{font-size:12.5px; font-weight:600; color:var(--ink)}
+  .tstep .act{font-size:11px; color:var(--gold-2); font-family:"IBM Plex Mono",monospace}
   .tstep .meta{font-size:10.5px; color:var(--faint); margin-left:auto; font-family:"IBM Plex Mono",monospace}
   .tstep .det{font-size:11.5px; color:var(--muted); margin-top:3px}
-  .guard-flag{display:inline-block; font-size:10px; font-weight:600; color:#fca5a5; background:rgba(248,113,113,.12);
-    border:1px solid rgba(248,113,113,.3); padding:2px 8px; border-radius:5px; margin-left:6px}
-  .draft{font-family:"IBM Plex Mono",monospace; font-size:12.5px; line-height:1.7; color:#cfd5e2;
-    background:#0e1118; border:1px solid var(--line); border-radius:10px; padding:18px; white-space:pre-wrap}
+  .guard-flag{display:inline-block; font-size:10px; font-weight:700; color:#be123c; background:#ffe4e9;
+    border:1px solid #fbcfd8; padding:2px 8px; border-radius:5px; margin-left:6px}
+  .draft{font-family:"IBM Plex Mono",monospace; font-size:12.5px; line-height:1.7; color:var(--text);
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:18px; white-space:pre-wrap; box-shadow:var(--shadow-sm)}
   .gate{display:flex; gap:12px; margin-top:18px}
   .gate button{flex:1; font-family:inherit; font-weight:600; font-size:13.5px; padding:13px; border-radius:10px; cursor:pointer; transition:.15s; border:1px solid transparent}
-  .gate .approve{background:rgba(52,211,153,.14); color:var(--emerald); border-color:rgba(52,211,153,.4)}
-  .gate .approve:hover{background:rgba(52,211,153,.24)}
-  .gate .reject{background:transparent; color:var(--muted); border-color:var(--line)}
-  .gate .reject:hover{color:#fca5a5; border-color:rgba(248,113,113,.4)}
-  .gate-note{font-size:11px; color:var(--faint); text-align:center; margin-top:11px; letter-spacing:.02em}
+  .gate .approve{background:linear-gradient(180deg,var(--green),var(--green-deep)); color:#fff; box-shadow:0 8px 18px -8px rgba(15,157,107,.55)}
+  .gate .approve:hover{transform:translateY(-1px)}
+  .gate .reject{background:#fff; color:var(--muted); border-color:var(--line)}
+  .gate .reject:hover{color:#be123c; border-color:#fbcfd8}
+  .gate-note{font-size:11px; color:var(--faint); text-align:center; margin-top:11px}
   .resolved-banner{margin-top:18px; padding:13px; border-radius:10px; text-align:center; font-size:13px; font-weight:600;
-    background:rgba(125,211,252,.1); color:#7dd3fc; border:1px solid rgba(125,211,252,.3)}
+    background:#dcf0fb; color:var(--sky); border:1px solid #b9e3f6}
 
-  /* toast */
   .toast{position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); z-index:60;
-    background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:13px 20px; font-size:13px;
+    background:#fff; border:1px solid var(--line); border-radius:11px; padding:13px 20px; font-size:13px; color:var(--ink);
     box-shadow:var(--shadow); opacity:0; transition:.3s; display:flex; align-items:center; gap:10px}
   .toast.show{opacity:1; transform:translateX(-50%)}
-  .toast .ic{color:var(--emerald)}
+  .toast .ic{color:var(--green)}
   .loading-veil{position:fixed; inset:0; z-index:55; display:none; align-items:center; justify-content:center;
-    background:rgba(11,13,18,.6); backdrop-filter:blur(4px)}
+    background:rgba(245,244,239,.72); backdrop-filter:blur(3px)}
   .loading-veil.show{display:flex}
-  .scanner{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--gold); letter-spacing:.05em}
+  .scanner{text-align:center; font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--green-deep); letter-spacing:.04em}
   .scanner .bars{display:flex; gap:5px; justify-content:center; margin-bottom:16px}
-  .scanner .bars i{width:5px;height:26px;background:var(--gold);border-radius:2px;animation:eq 1s infinite ease-in-out}
+  .scanner .bars i{width:5px;height:26px;background:var(--green);border-radius:2px;animation:eq 1s infinite ease-in-out}
   .scanner .bars i:nth-child(2){animation-delay:.12s} .scanner .bars i:nth-child(3){animation-delay:.24s}
   .scanner .bars i:nth-child(4){animation-delay:.36s} .scanner .bars i:nth-child(5){animation-delay:.48s}
   @keyframes eq{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
@@ -202,21 +149,20 @@
   @media(max-width:920px){.hero{grid-template-columns:1fr; gap:30px} .confbar{display:none}}
 </style>
 </head>
-<body>
+<body class="bg-atmos">
 <header class="topbar">
-  <div class="brand">
+  <a class="brand" href="/">
     <svg class="mark" viewBox="0 0 32 32" fill="none">
-      <path d="M16 2 L28 7 V16 C28 24 22 29 16 31 C10 29 4 24 4 16 V7 Z" stroke="var(--gold)" stroke-width="1.6" fill="rgba(244,196,81,.06)"/>
+      <path d="M16 2 L28 7 V16 C28 24 22 29 16 31 C10 29 4 24 4 16 V7 Z" stroke="var(--gold)" stroke-width="1.6" fill="rgba(182,137,43,.08)"/>
       <path d="M16 11 C13 14 13 17 16 21 C19 17 19 14 16 11Z" fill="var(--t-overage)"/>
       <circle cx="16" cy="24" r="1.5" fill="var(--gold)"/>
     </svg>
-    <div>
-      <h1>LeakSentry</h1>
-      <div class="sub">Revenue Leakage Audit</div>
-    </div>
-  </div>
+    <div><h1>LeakSentry</h1><div class="sub">Revenue Leakage Audit</div></div>
+  </a>
   <div class="spacer"></div>
   <div class="engine" id="engine"><span class="dot"></span><span id="engineLabel">connecting…</span></div>
+  <div class="userbox"><span class="avatar" id="avatar">G</span><span id="userName">Guest</span>
+    <button class="signout" onclick="signout()">Sign out</button></div>
   <button class="run" id="runBtn" onclick="runAudit()"><span class="pulse"></span> Run Audit</button>
 </header>
 
@@ -255,7 +201,7 @@
         <th class="rank">#</th><th>Customer</th><th>Leak type</th>
         <th class="r">$ Impact</th><th>Confidence</th><th class="r">Status</th>
       </tr></thead>
-      <tbody id="rows"><tr><td colspan="6" style="padding:40px;text-align:center;color:var(--faint)">No audit run yet — click <b style="color:var(--gold)">Run Audit</b>.</td></tr></tbody>
+      <tbody id="rows"><tr><td colspan="6" style="padding:40px;text-align:center;color:var(--faint)">No audit run yet — click <b style="color:var(--green-deep)">Run Audit</b>.</td></tr></tbody>
     </table>
   </section>
 </div>
@@ -281,11 +227,11 @@
 
 <script>
 const TYPE = {
-  UNDER_USAGE_OVERAGE:{c:'var(--t-overage)',l:'Usage overage'},
-  MISSED_RENEWAL:{c:'var(--t-renewal)',l:'Missed renewal'},
-  UNDER_BILLING:{c:'var(--t-billing)',l:'Under-billing'},
-  EXPIRED_DISCOUNT:{c:'var(--t-discount)',l:'Expired discount'},
-  MINIMUM_COMMIT_SHORTFALL:{c:'var(--t-commit)',l:'Min-commit shortfall'},
+  UNDER_USAGE_OVERAGE:{c:'#0d9488',l:'Usage overage'},
+  MISSED_RENEWAL:{c:'#e07c12',l:'Missed renewal'},
+  UNDER_BILLING:{c:'#2563eb',l:'Under-billing'},
+  EXPIRED_DISCOUNT:{c:'#d61f73',l:'Expired discount'},
+  MINIMUM_COMMIT_SHORTFALL:{c:'#7c4ddb',l:'Min-commit shortfall'},
 };
 const fmt = n => '$'+Math.round(n).toLocaleString('en-US');
 const fmt2 = n => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -293,7 +239,15 @@ let DATA=null, FILTER='ALL';
 
 async function api(p,m='GET'){const r=await fetch(p,{method:m});if(!r.ok)throw new Error(await r.text());return r.json();}
 
+function loadUser(){
+  let u='Guest'; try{ u=localStorage.getItem('leaksentry_user')||'Guest'; }catch(e){}
+  document.getElementById('userName').textContent=u;
+  document.getElementById('avatar').textContent=(u[0]||'G').toUpperCase();
+}
+function signout(){ try{ localStorage.removeItem('leaksentry_user'); }catch(e){} location.href='/'; }
+
 async function init(){
+  loadUser();
   try{const h=await api('/api/health');
     document.getElementById('engineLabel').textContent = h.judgment_engine==='gemini' ? ('Gemini · '+h.model) : 'Heuristic judge (no API key)';
     document.getElementById('engine').classList.toggle('heur', h.judgment_engine!=='gemini');
@@ -323,7 +277,6 @@ function render(){
   document.getElementById('cConfirmed').textContent=s.counts.CONFIRMED||0;
   document.getElementById('cReview').textContent=(s.counts.NEEDS_REVIEW||0)+' · '+fmt(s.needs_review_total);
   document.getElementById('cNoise').textContent=s.counts.DISMISSED||0;
-  // bars
   const max=Math.max(...s.breakdown.map(b=>b.confirmed_dollars),1);
   document.getElementById('bars').innerHTML = s.breakdown.map(b=>{
     const t=TYPE[b.leak_type]; const w=(b.confirmed_dollars/max*100).toFixed(1);

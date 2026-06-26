@@ -51,7 +51,15 @@ LeakSentry is an **autonomous, multi-agent auditor**. It:
 > real leaks from legitimate noise. Every dollar figure is traceable to deterministic
 > code, never hallucinated by the model.
 
-### 🖥️ The dashboard
+### 🖥️ The app
+
+A landing page leads into a one-click demo. Auth is **cosmetic only** (no backend) —
+sign in, sign up, or **Continue as guest** all land on the dashboard.
+
+![LeakSentry landing page](docs/landing.png)
+
+The single-screen dashboard: an animated recoverable-leakage total, a confidence-weighted
+breakdown by leak type, and a prioritized findings ledger.
 
 ![LeakSentry dashboard](docs/dashboard.png)
 
@@ -61,10 +69,9 @@ agents ran, which tools they called, with timings), and the drafted recovery art
 behind an **[Approve] / [Reject]** human gate (approve only marks it resolved in case
 memory — nothing is ever sent).
 
-<p align="center">
-  <img src="docs/finding-detail.png" width="49%" alt="Recovery draft + approval gate" />
-  <img src="docs/finding-evidence.png" width="49%" alt="Conflicting evidence + agent explanation" />
-</p>
+![Finding detail — evidence, trace, recovery draft](docs/finding-detail.png)
+
+**Routes:** `/` landing · `/signin` · `/signup` · `/app` dashboard · `/api/*` JSON API.
 
 ## 🏗️ Architecture
 
@@ -162,8 +169,8 @@ python data/generate_dataset.py     # 52 injected leaks + 43 noise traps
 # 3a. See the evidence the agent works (precision/recall vs ground truth)
 python eval/run_eval.py --mode both
 
-# 3b. Launch the dashboard, then click "Run Audit"
-uvicorn backend.main:app --reload   # → http://localhost:8000
+# 3b. Launch the app, open the landing page, "Continue as guest", click "Run Audit"
+uvicorn backend.main:app --reload   # → http://localhost:8000  (→ /app for the dashboard)
 ```
 
 Or with Docker: `docker compose up` (also seeds data) — see [`docker-compose.yml`](docker-compose.yml).

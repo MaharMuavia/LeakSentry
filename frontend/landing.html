@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LeakSentry — Autonomous Revenue Leakage Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  .wrap{max-width:1180px; margin:0 auto; padding:0 28px}
+  nav.top{display:flex; align-items:center; gap:16px; padding:20px 28px; max-width:1180px; margin:0 auto}
+  nav .links{display:flex; align-items:center; gap:8px; margin-left:auto}
+  .nav-pill{font-size:13px; color:var(--muted); padding:9px 14px; border-radius:9px; transition:.15s}
+  .nav-pill:hover{color:var(--ink); background:#fff}
+
+  .hero{display:grid; grid-template-columns:1.08fr .92fr; gap:50px; align-items:center; padding:54px 0 40px}
+  .eyebrow{display:inline-flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.06em; color:var(--green-deep);
+    background:var(--green-soft); border:1px solid #bfe9d6; padding:6px 13px; border-radius:999px; font-weight:600}
+  .hero h2{font-family:"Fraunces",serif; font-weight:600; font-size:clamp(38px,5.4vw,62px); line-height:1.02;
+    letter-spacing:-.02em; color:var(--ink); margin:22px 0 0}
+  .hero h2 em{font-style:italic; color:var(--gold-2)}
+  .hero .lead{font-size:17px; color:var(--muted); margin-top:20px; max-width:50ch}
+  .cta{display:flex; gap:13px; margin-top:30px; flex-wrap:wrap; align-items:center}
+  .stat-row{display:flex; gap:26px; margin-top:34px; flex-wrap:wrap}
+  .stat .n{font-family:"Fraunces",serif; font-size:26px; font-weight:600; color:var(--ink)}
+  .stat .l{font-size:12px; color:var(--faint); letter-spacing:.04em; text-transform:uppercase; margin-top:2px}
+  .stat .n .u{color:var(--green); font-size:.7em; vertical-align:.08em}
+
+  /* reconciliation visual */
+  .viz{position:relative}
+  .viz .card-vz{padding:26px}
+  .srcrow{display:flex; align-items:center; gap:12px; padding:13px 15px; border:1px solid var(--line); border-radius:12px;
+    margin-bottom:11px; background:var(--paper-2); position:relative}
+  .srcrow .ic{width:34px;height:34px;border-radius:9px; display:grid; place-items:center; flex:0 0 auto; color:#fff; font-weight:700; font-size:13px}
+  .srcrow .t{font-size:13.5px; font-weight:600; color:var(--ink)} .srcrow .d{font-size:11.5px; color:var(--faint)}
+  .srcrow .val{margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:600}
+  .conflict{color:var(--t-discount)}
+  .verdict{margin-top:16px; padding:15px; border-radius:12px; background:linear-gradient(180deg,#fff,#fbfbf8);
+    border:1px solid var(--gold-soft); box-shadow:var(--shadow-sm); display:flex; align-items:center; gap:13px}
+  .verdict .badge{font-size:11px; font-weight:700; color:#fff; background:var(--green); padding:5px 10px; border-radius:8px}
+  .verdict .amt{margin-left:auto; font-family:"IBM Plex Mono",monospace; font-weight:600; color:var(--green-deep); font-size:16px}
+
+  section.feat{padding:54px 0}
+  .feat h3.sec{font-family:"Fraunces",serif; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-2); text-align:center}
+  .feat h4.sec{font-family:"Fraunces",serif; font-size:30px; color:var(--ink); text-align:center; margin:8px 0 36px; font-weight:600}
+  .grid4{display:grid; grid-template-columns:repeat(4,1fr); gap:18px}
+  .fcard{padding:22px}
+  .fcard .fi{width:38px;height:38px;border-radius:10px; display:grid; place-items:center; font-size:18px; margin-bottom:14px}
+  .fcard h5{font-size:15px; color:var(--ink); font-weight:600; margin-bottom:7px}
+  .fcard p{font-size:13px; color:var(--muted); line-height:1.55}
+
+  .resultbar{display:flex; align-items:center; gap:30px; padding:26px 32px; margin:18px 0 0; flex-wrap:wrap;
+    background:linear-gradient(120deg,#0b7a52,#0f9d6b); color:#fff; border-radius:18px; box-shadow:var(--shadow)}
+  .resultbar .big{font-family:"Fraunces",serif; font-size:34px; font-weight:600}
+  .resultbar .lab{font-size:13px; opacity:.85}
+  .resultbar .m{display:flex; gap:24px; margin-left:auto; flex-wrap:wrap}
+  .resultbar .m div b{font-family:"IBM Plex Mono",monospace; font-size:20px; display:block}
+  .resultbar .m div span{font-size:11px; opacity:.82; letter-spacing:.04em}
+
+  footer{padding:40px 0 56px; color:var(--faint); font-size:13px; text-align:center; border-top:1px solid var(--line); margin-top:50px}
+  .reveal{opacity:0; transform:translateY(16px); animation:rise .7s forwards}
+  @keyframes rise{to{opacity:1; transform:none}}
+  @media(max-width:900px){.hero{grid-template-columns:1fr; gap:34px} .grid4{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid4{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="bg-atmos">
+<nav class="top">
+  <a class="brand" href="/">
+    <svg class="mark" viewBox="0 0 32 32" fill="none">
+      <path d="M16 2 L28 7 V16 C28 24 22 29 16 31 C10 29 4 24 4 16 V7 Z" stroke="var(--gold)" stroke-width="1.6" fill="rgba(182,137,43,.08)"/>
+      <path d="M16 11 C13 14 13 17 16 21 C19 17 19 14 16 11Z" fill="var(--t-overage)"/>
+      <circle cx="16" cy="24" r="1.5" fill="var(--gold)"/>
+    </svg>
+    <div><h1>LeakSentry</h1><div class="sub">Revenue Leakage Audit</div></div>
+  </a>
+  <div class="links">
+    <a class="nav-pill" href="/signin">Sign in</a>
+    <a class="btn btn-gold" href="/signup">Get started</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <span class="eyebrow reveal">● Multi-agent · powered by Google Gemini</span>
+      <h2 class="reveal" style="animation-delay:.05s">Find the revenue<br/>you're <em>silently losing.</em></h2>
+      <p class="lead reveal" style="animation-delay:.1s">LeakSentry is an autonomous multi-agent auditor that reconciles your
+        <b>contracts</b>, <b>invoices</b>, and <b>usage</b> — three systems that never quite agree — to surface under-billing,
+        expired discounts, missed renewals and unbilled overages, quantify each one in dollars, and draft the recovery behind a human-approval gate.</p>
+      <div class="cta reveal" style="animation-delay:.15s">
+        <a class="btn btn-primary" href="/app">Continue as guest →</a>
+        <a class="btn btn-ghost" href="/signup">Create an account</a>
+      </div>
+      <div class="stat-row reveal" style="animation-delay:.2s">
+        <div class="stat"><div class="n mono"><span class="u">$</span>440K</div><div class="l">leakage surfaced</div></div>
+        <div class="stat"><div class="n mono">1.00</div><div class="l">precision · recall</div></div>
+        <div class="stat"><div class="n mono">100%</div><div class="l">dollar-recall</div></div>
+      </div>
+    </div>
+    <div class="viz reveal" style="animation-delay:.18s">
+      <div class="panel card-vz">
+        <div style="font-size:12px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Customer C0019 · Compute</div>
+        <div class="srcrow"><div class="ic" style="background:var(--t-billing)">C</div><div><div class="t">Contract</div><div class="d">committed 400 / mo @ $49.87</div></div><div class="val">400</div></div>
+        <div class="srcrow"><div class="ic" style="background:var(--t-renewal)">I</div><div><div class="t">Invoice</div><div class="d">billed quantity</div></div><div class="val">400</div></div>
+        <div class="srcrow"><div class="ic" style="background:var(--t-overage)">U</div><div><div class="t">Usage</div><div class="d">actual consumption</div></div><div class="val conflict">560 ▲</div></div>
+        <div class="verdict"><span class="badge">LEAK</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Unbilled usage overage</div><div style="font-size:11.5px;color:var(--faint)">160 units/mo never invoiced</div></div><div class="amt">+$101,884</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section class="feat">
+    <h3 class="sec">How it works</h3>
+    <h4 class="sec">Deterministic detection + LLM judgment</h4>
+    <div class="grid4">
+      <div class="panel fcard"><div class="fi" style="background:var(--green-soft);color:var(--green-deep)">①</div><h5>Reconcile</h5><p>Loads contracts, invoices and usage and lines up every disagreement across the three sources.</p></div>
+      <div class="panel fcard"><div class="fi" style="background:#e7efff;color:var(--t-billing)">②</div><h5>Detect</h5><p>Exact pandas math finds candidate leaks and computes every dollar figure — never the model.</p></div>
+      <div class="panel fcard"><div class="fi" style="background:var(--gold-soft);color:var(--gold-2)">③</div><h5>Judge</h5><p>Gemini investigates each candidate with tools: a real leak, or explainable noise like a renegotiated price?</p></div>
+      <div class="panel fcard"><div class="fi" style="background:#f6e7f1;color:var(--t-discount)">④</div><h5>Recover</h5><p>Drafts the correction or outreach behind a human-approval gate. Nothing is ever sent automatically.</p></div>
+    </div>
+
+    <div class="resultbar reveal">
+      <div><div class="big">Provably accurate.</div><div class="lab">Measured against 52 labeled leaks hidden among 43 noise traps.</div></div>
+      <div class="m">
+        <div><b>1.000</b><span>PRECISION</span></div>
+        <div><b>1.000</b><span>RECALL</span></div>
+        <div><b>100%</b><span>DOLLAR-RECALL</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">MIT-licensed · built for the Kaggle AI Agents Capstone (Agents for Business) ·
+  <a href="https://github.com/MaharMuavia/LeakSentry" style="color:var(--green-deep);font-weight:600">github.com/MaharMuavia/LeakSentry</a></div>
+</footer>
+</body>
+</html>

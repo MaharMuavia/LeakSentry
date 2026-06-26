@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign in · LeakSentry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="/theme.css" />
+</head>
+<body>
+<div class="auth-wrap">
+  <aside class="auth-aside">
+    <div class="glow"></div>
+    <a class="brand" href="/" style="position:relative;z-index:2">
+      <svg class="mark" viewBox="0 0 32 32" fill="none">
+        <path d="M16 2 L28 7 V16 C28 24 22 29 16 31 C10 29 4 24 4 16 V7 Z" stroke="#fff" stroke-width="1.6" fill="rgba(255,255,255,.12)"/>
+        <path d="M16 11 C13 14 13 17 16 21 C19 17 19 14 16 11Z" fill="#fff"/>
+        <circle cx="16" cy="24" r="1.5" fill="#fff"/>
+      </svg>
+      <div><h1 style="color:#fff">LeakSentry</h1><div class="sub" style="color:rgba(255,255,255,.7)">Revenue Leakage Audit</div></div>
+    </a>
+    <div style="position:relative;z-index:2;margin-top:auto;position:absolute;bottom:46px;left:46px;right:46px">
+      <div class="serif" style="font-size:30px;font-weight:600;line-height:1.12;letter-spacing:-.01em">
+        “Companies lose 1–5% of revenue to leakage they never see.”</div>
+      <div style="margin-top:16px;font-size:14px;opacity:.85">LeakSentry reconciles contracts, invoices and usage to find it — and quantify it to the dollar.</div>
+    </div>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <h2>Welcome back</h2>
+      <p class="lead">Sign in to run an audit. <b>(Demo — no real authentication.)</b></p>
+      <form onsubmit="return go(event)">
+        <div class="field"><label>Work email</label><input type="email" id="email" placeholder="you@company.com" required /></div>
+        <div class="field"><label>Password</label><input type="password" id="pw" placeholder="••••••••" required /></div>
+        <button class="btn btn-primary" type="submit">Sign in</button>
+      </form>
+      <div class="divider">or</div>
+      <button class="btn btn-ghost guest" onclick="guest()">Continue as guest →</button>
+      <div class="auth-foot">New here? <a href="/signup">Create an account</a></div>
+    </div>
+  </main>
+</div>
+<script>
+  function setUser(name){ try{ localStorage.setItem('leaksentry_user', name); }catch(e){} location.href='/app'; }
+  function go(e){ e.preventDefault(); const em=document.getElementById('email').value.trim(); setUser(em||'Member'); return false; }
+  function guest(){ setUser('Guest'); }
+</script>
+</body>
+</html>

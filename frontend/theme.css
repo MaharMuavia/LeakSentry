@@ -1,0 +1,98 @@
+/* LeakSentry — shared light design system ("financial paper / refined audit") */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+:root{
+  --paper:#f5f4ef; --paper-2:#faf9f5; --card:#ffffff;
+  --line:#e7e2d7; --line-2:#efebe1;
+  --ink:#1a1d23; --text:#33373f; --muted:#6c7280; --faint:#9aa0ab;
+  --gold:#b6892b; --gold-2:#9c7421; --gold-soft:#f4ead0;
+  --green:#0f9d6b; --green-deep:#0b7a52; --green-soft:#d9f3e8;
+  --amber:#d97706; --amber-soft:#fdeccf; --slate:#9aa3b2; --sky:#0a87c4;
+  --t-overage:#0d9488; --t-renewal:#e07c12; --t-billing:#2563eb;
+  --t-discount:#d61f73; --t-commit:#7c4ddb;
+  --shadow-sm:0 1px 2px rgba(30,28,22,.05),0 2px 6px rgba(30,28,22,.05);
+  --shadow:0 14px 38px -16px rgba(40,36,26,.22);
+  --shadow-lg:0 36px 70px -28px rgba(40,36,26,.34);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"IBM Plex Sans",system-ui,sans-serif; color:var(--text);
+  background:var(--paper); line-height:1.5; -webkit-font-smoothing:antialiased; min-height:100vh;
+}
+body.bg-atmos{position:relative; overflow-x:hidden}
+body.bg-atmos::before{
+  content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(820px 480px at 82% -6%, rgba(182,137,43,.10), transparent 62%),
+    radial-gradient(720px 520px at 4% 104%, rgba(15,157,107,.09), transparent 60%),
+    var(--paper);
+}
+body.bg-atmos::after{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.5;
+  background-image:linear-gradient(var(--ink) 1px,transparent 1px),linear-gradient(90deg,var(--ink) 1px,transparent 1px);
+  background-size:48px 48px; mask-image:radial-gradient(circle at 50% 20%,#000,transparent 78%); opacity:.035;
+}
+.mono{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.serif{font-family:"Fraunces",serif}
+a{color:inherit; text-decoration:none}
+
+/* ---- brand mark ---- */
+.brand{display:flex; align-items:center; gap:11px}
+.mark{width:30px;height:30px;flex:0 0 auto}
+.brand h1{font-size:19px; font-weight:600; letter-spacing:-.01em; color:var(--ink)}
+.brand .sub{font-size:10.5px; color:var(--faint); letter-spacing:.17em; text-transform:uppercase}
+
+/* ---- buttons ---- */
+.btn{font-family:inherit; font-weight:600; font-size:14px; border-radius:11px; padding:12px 20px;
+  cursor:pointer; border:1px solid transparent; transition:transform .15s, box-shadow .2s, background .2s;
+  display:inline-flex; align-items:center; gap:9px; white-space:nowrap}
+.btn-primary{color:#fff; background:linear-gradient(180deg,var(--green),var(--green-deep));
+  box-shadow:0 10px 22px -10px rgba(15,157,107,.6)}
+.btn-primary:hover{transform:translateY(-1px); box-shadow:0 14px 28px -10px rgba(15,157,107,.72)}
+.btn-gold{color:#3a2c08; background:linear-gradient(180deg,#e7c463,var(--gold));
+  box-shadow:0 10px 22px -10px rgba(182,137,43,.6)}
+.btn-gold:hover{transform:translateY(-1px)}
+.btn-ghost{color:var(--ink); background:var(--card); border-color:var(--line); box-shadow:var(--shadow-sm)}
+.btn-ghost:hover{border-color:var(--gold); color:var(--gold-2)}
+.btn-link{background:none; color:var(--muted); padding:12px 8px}
+.btn-link:hover{color:var(--green-deep)}
+.btn:disabled{opacity:.6; cursor:wait; transform:none}
+
+/* ---- panel / pill ---- */
+.panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow)}
+.pill{display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600;
+  padding:4px 10px; border-radius:999px; letter-spacing:.02em}
+.pill .swatch{width:7px;height:7px;border-radius:50%}
+
+/* ---- topbar ---- */
+.topbar{display:flex; align-items:center; gap:16px; padding:18px 28px; border-bottom:1px solid var(--line);
+  position:sticky; top:0; z-index:30; background:rgba(250,249,245,.82); backdrop-filter:blur(12px)}
+.topbar .spacer{flex:1}
+
+/* ---- auth split ---- */
+.auth-wrap{min-height:100vh; display:grid; grid-template-columns:1.05fr 1fr}
+.auth-aside{position:relative; padding:46px; color:#fff; overflow:hidden;
+  background:linear-gradient(150deg,#0b7a52,#0f9d6b 52%,#15b07a)}
+.auth-aside::after{content:""; position:absolute; inset:0; opacity:.16; pointer-events:none;
+  background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);
+  background-size:34px 34px; mask-image:radial-gradient(circle at 70% 20%,#000,transparent 75%)}
+.auth-aside .glow{position:absolute; width:420px;height:420px; border-radius:50%; right:-120px; top:-120px;
+  background:radial-gradient(circle,rgba(244,234,208,.4),transparent 65%)}
+.auth-main{display:flex; align-items:center; justify-content:center; padding:40px; background:var(--paper)}
+.auth-card{width:100%; max-width:392px}
+.auth-card h2{font-family:"Fraunces",serif; font-weight:600; font-size:27px; color:var(--ink); letter-spacing:-.01em}
+.auth-card .lead{color:var(--muted); font-size:14px; margin-top:8px; margin-bottom:26px}
+.field{margin-bottom:15px}
+.field label{display:block; font-size:12px; font-weight:600; color:var(--ink); margin-bottom:6px; letter-spacing:.01em}
+.field input{width:100%; font-family:inherit; font-size:14.5px; color:var(--ink); background:var(--card);
+  border:1px solid var(--line); border-radius:10px; padding:12px 14px; transition:border .15s, box-shadow .15s}
+.field input:focus{outline:none; border-color:var(--green); box-shadow:0 0 0 3px rgba(15,157,107,.14)}
+.auth-card .btn-primary{width:100%; justify-content:center; margin-top:6px}
+.divider{display:flex; align-items:center; gap:12px; margin:22px 0; color:var(--faint); font-size:12px}
+.divider::before,.divider::after{content:""; flex:1; height:1px; background:var(--line)}
+.guest{width:100%; justify-content:center; margin-top:2px}
+.auth-foot{text-align:center; font-size:13px; color:var(--muted); margin-top:22px}
+.auth-foot a{color:var(--green-deep); font-weight:600}
+@media(max-width:860px){.auth-wrap{grid-template-columns:1fr} .auth-aside{display:none}}
