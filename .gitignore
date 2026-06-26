@@ -39,6 +39,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# ---- Playwright / scratch screenshots (docs/*.png are tracked) ----
+.playwright-mcp/
+/*.png
+
 # ---- OS / editor ----
 .DS_Store
 Thumbs.db
