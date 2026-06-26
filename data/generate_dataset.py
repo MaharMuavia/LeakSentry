@@ -159,8 +159,10 @@ for role in roles_pool:
     i = idxs.pop()
     plan[i]["role"] = role
 
-# Pick one clean contract to carry the prompt-injection "poisoned notes" row.
-poison_idx = next(i for i in idxs if plan[i]["role"] == "clean")
+# Plant the prompt-injection "poisoned notes" on a GENUINE leak contract, so the
+# malicious text actually flows into the judge's prompt and Guardrail 3 has to
+# catch it — while the underlying leak must still be reported.
+poison_idx = next(i for i, e in enumerate(plan) if e["role"] == "under_billing")
 plan[poison_idx]["poisoned"] = True
 
 

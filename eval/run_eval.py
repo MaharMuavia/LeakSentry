@@ -39,11 +39,15 @@ def _deterministic_findings() -> list[dict]:
 
 def _agent_findings() -> list[dict]:
     from agents.orchestrator import OrchestratorAgent
+    from models import FindingStatus
+    from tools import case_memory
+    case_memory.reset_memory()              # clean slate so nothing is suppressed
     report = OrchestratorAgent().run()      # audit all customers
-    # Only CONFIRMED findings count toward the headline metrics.
+    # A positive detection = CONFIRMED or NEEDS_REVIEW (dismissed noise is negative).
+    positive = (FindingStatus.CONFIRMED, FindingStatus.NEEDS_REVIEW)
     return [{"customer_id": f.customer_id, "contract_id": f.contract_id,
              "leak_type": f.leak_type.value, "dollar_impact": f.dollar_impact}
-            for f in report.confirmed]
+            for f in report.findings if f.status in positive]
 
 
 def _print(mode: str, res: EvalResult) -> None:

@@ -27,8 +27,8 @@ class CaseRecord(SQLModel, table=True):
     confidence: float
     status: str                      # CONFIRMED / NEEDS_REVIEW / RESOLVED / DISMISSED
     explanation: str = ""
-    first_seen: str = Field(default_factory=lambda: dt.datetime.utcnow().isoformat())
-    last_seen: str = Field(default_factory=lambda: dt.datetime.utcnow().isoformat())
+    first_seen: str = Field(default_factory=lambda: dt.datetime.now(dt.timezone.utc).isoformat())
+    last_seen: str = Field(default_factory=lambda: dt.datetime.now(dt.timezone.utc).isoformat())
     resolved: bool = False
 
 
@@ -46,7 +46,7 @@ def write_case_memory(*, signature: str, leak_type: str, customer_id: str,
                       contract_id: str, product: str, dollar_impact: float,
                       confidence: float, status: str, explanation: str = "") -> CaseRecord:
     """Insert or update a case record (idempotent on signature)."""
-    now = dt.datetime.utcnow().isoformat()
+    now = dt.datetime.now(dt.timezone.utc).isoformat()
     with Session(_engine) as s:
         rec = s.get(CaseRecord, signature)
         if rec is None:
@@ -77,7 +77,7 @@ def mark_resolved(signature: str) -> bool:
             return False
         rec.resolved = True
         rec.status = "RESOLVED"
-        rec.last_seen = dt.datetime.utcnow().isoformat()
+        rec.last_seen = dt.datetime.now(dt.timezone.utc).isoformat()
         s.add(rec)
         s.commit()
         return True
