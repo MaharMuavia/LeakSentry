@@ -1,4 +1,4 @@
-# ---- LeakSentry Python dependencies ----
+# ---- RevVeritas Python dependencies ----
 # Agent reasoning model
 google-genai>=0.3.0
 
